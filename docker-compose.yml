@@ -1,0 +1,41 @@
+version: '3'
+services:
+  crdb:
+    image: cockroachdb/cockroach
+    networks:
+      - incrr
+    command: "start --insecure"
+  mysql:
+    image: mysql:5.7
+    networks:
+      - incrr
+    environment:
+      MYSQL_ROOT_PASSWORD: doNotUseThisInProd123
+      MYSQL_DATABASE: incrr
+      MYSQL_USER: user1
+      MYSQL_PASSWORD: password1
+  dev:
+    build:
+      context: .
+      args:
+        env_dir: dev
+    ports:
+     - "4801-4803:80"     # we can start up to 3 with different ports
+     - "44431-44433:443"  # we can start up to 3 with different ports
+    environment:
+      MYSQL_HOSTNAME: "incrr_mysql_1"
+    volumes:
+      - "${PWD}/dev/config.toml:/var/config/config.toml/"
+    depends_on:
+      - mysql
+      - crdb
+    networks:
+      - incrr
+    command: "-config /var/config/config.toml"
+
+networks:
+  incrr:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.10.0/29 # lock it to 6 IP addresses

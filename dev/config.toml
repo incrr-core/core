@@ -1,0 +1,17 @@
+environment = "dev"
+show_config = true
+
+[server]
+force_http = true
+
+[server.api]
+domains = ["api.localhost", "localhost"]
+
+[datastore]
+use_remote_db = "crdb"
+
+[datastore.remote.crdb]
+dsn = "postgres://root:@incrr_crdb_1:26257/incrr?sslmode=disable"
+
+[groupcache]
+http_pool = ["http://172.18.10.4:80", "http://172.18.10.5:80", "http://172.18.10.6:80"]
